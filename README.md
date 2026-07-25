@@ -105,8 +105,7 @@ NeuroSpeak/
 | T1   | Left hand motor imagery  |
 | T2   | Right hand motor imagery |
 
-Download: https://physionet.org/content/eegmmidb/1.0.0/
-
+## Download:https://physionet.org/content/eegmmidb/1.0.0/
 ---
 
 ## 🚀 Quick Start
