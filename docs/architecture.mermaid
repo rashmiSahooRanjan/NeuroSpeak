@@ -1,0 +1,40 @@
+---
+title: NeuroSpeak System Architecture
+---
+graph TD
+    A[📡 EEG Sensor / EDF File] --> B[MNE-Python Loader]
+    B --> C[Bandpass Filter 1-40Hz]
+    C --> D[Notch Filter 60Hz]
+    D --> E[Average Re-reference]
+    E --> F[ICA Artifact Removal]
+    F --> G[Epoch Segmentation 2s]
+
+    G --> H[Feature Extraction]
+    H --> H1[PSD - Welch Method]
+    H --> H2[Hjorth Parameters]
+    H --> H3[Time Domain Stats]
+
+    H1 --> I[Feature Matrix 1024-dim]
+    H2 --> I
+    H3 --> I
+
+    I --> J{ML Classifier}
+    J --> J1[Random Forest]
+    J --> J2[SVM RBF]
+    J --> J3[CNN-LSTM ★ Best]
+
+    J1 --> K[T0/T1/T2 Labels]
+    J2 --> K
+    J3 --> K
+
+    K --> L[Text Mapping Engine]
+    L --> M[Generated Text]
+
+    M --> N[Flask REST API]
+    N --> O[Web Dashboard]
+    N --> P[PDF Report]
+    N --> Q[MongoDB Storage]
+
+    style J3 fill:#00E5FF,color:#000
+    style M  fill:#00FF9D,color:#000
+    style N  fill:#7B61FF,color:#fff
