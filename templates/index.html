@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroSpeak – Brain Signal to Text Communication System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.3/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.3/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+<!-- ─── LOADING SCREEN ───────────────────────────────────────────────── -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-brain">
+      <svg viewBox="0 0 120 100" fill="none">
+        <ellipse cx="60" cy="52" rx="38" ry="32" stroke="#00E5FF" stroke-width="2"/>
+        <path d="M22 52 Q30 30 60 28 Q90 30 98 52" stroke="#7B61FF" stroke-width="1.5" fill="none"/>
+        <path d="M35 38 Q38 25 55 22" stroke="#00FF9D" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+        <path d="M85 38 Q82 25 65 22" stroke="#00FF9D" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+        <circle class="pulse-dot" cx="45" cy="45" r="3" fill="#00E5FF"/>
+        <circle class="pulse-dot" cx="75" cy="45" r="3" fill="#7B61FF"/>
+        <circle class="pulse-dot" cx="60" cy="60" r="3" fill="#00FF9D"/>
+        <line x1="48" y1="45" x2="57" y2="60" stroke="#00E5FF" stroke-width="1" opacity="0.6"/>
+        <line x1="72" y1="45" x2="63" y2="60" stroke="#7B61FF" stroke-width="1" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="loader-text">NEUROSPEAK</div>
+    <div class="loader-sub">Initializing Neural Interface...</div>
+    <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+  </div>
+</div>
+
+<!-- ─── TOAST ────────────────────────────────────────────────────────── -->
+<div id="toastContainer"></div>
+
+<!-- ─── SIDEBAR NAV ───────────────────────────────────────────────────── -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-icon">🧠</span>
+    <span class="logo-text">NeuroSpeak</span>
+  </div>
+  <div class="sidebar-links">
+    <a href="#hero" class="nav-link active" data-section="hero">
+      <span class="nav-icon">⚡</span><span>Home</span>
+    </a>
+    <a href="#upload" class="nav-link" data-section="upload">
+      <span class="nav-icon">📡</span><span>Upload EEG</span>
+    </a>
+    <a href="#visualization" class="nav-link" data-section="visualization">
+      <span class="nav-icon">🌊</span><span>Visualization</span>
+    </a>
+    <a href="#pipeline" class="nav-link" data-section="pipeline">
+      <span class="nav-icon">⚙️</span><span>AI Pipeline</span>
+    </a>
+    <a href="#prediction" class="nav-link" data-section="prediction">
+      <span class="nav-icon">🎯</span><span>Prediction</span>
+    </a>
+    <a href="#analytics" class="nav-link" data-section="analytics">
+      <span class="nav-icon">📊</span><span>Analytics</span>
+    </a>
+    <a href="#history" class="nav-link" data-section="history">
+      <span class="nav-icon">🕐</span><span>History</span>
+    </a>
+  </div>
+  <div class="sidebar-status">
+    <span class="status-dot" id="serverDot"></span>
+    <span id="serverStatus">Connecting...</span>
+  </div>
+</nav>
+
+<!-- ─── MAIN CONTENT ──────────────────────────────────────────────────── -->
+<main class="main-content">
+
+  <!-- ─── HERO ─────────────────────────────────────────────────────────── -->
+  <section id="hero" class="section hero-section">
+    <div class="hero-bg">
+      <div class="grid-overlay"></div>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>AI-Powered Brain-Computer Interface
+      </div>
+      <h1 class="hero-title">
+        <span class="title-neuro">Neuro</span><span class="title-speak">Speak</span>
+      </h1>
+      <p class="hero-subtitle">Brain Signal to Text Communication System</p>
+      <p class="hero-desc">
+        Decode EEG brain signals into meaningful text using cutting-edge AI, 
+        CNN-LSTM deep learning, and real-time signal processing.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-value" id="hAccuracy">94.7%</span>
+          <span class="stat-label">Model Accuracy</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-value">160Hz</span>
+          <span class="stat-label">Sampling Rate</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-value">64Ch</span>
+          <span class="stat-label">EEG Channels</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-value" id="hLatency">~220ms</span>
+          <span class="stat-label">Inference Time</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="scrollToSection('upload')">
+          <span>Start Analysis</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <button class="btn-secondary" onclick="scrollToSection('upload')">
+          <span>Upload EEG File</span>
+        </button>
+      </div>
+    </div>
+    <div class="hero-brain">
+      <div class="brain-container">
+        <svg class="brain-svg" viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg">
+          <!-- Brain outline -->
+          <ellipse cx="150" cy="135" rx="100" ry="85" fill="none" stroke="#00E5FF" stroke-width="1.5" opacity="0.4"/>
+          <!-- Neural connections animated -->
+          <g class="neural-net">
+            <circle cx="100" cy="100" r="5" fill="#00E5FF" class="node"/>
+            <circle cx="150" cy="80"  r="5" fill="#7B61FF" class="node"/>
+            <circle cx="200" cy="100" r="5" fill="#00E5FF" class="node"/>
+            <circle cx="80"  cy="140" r="5" fill="#00FF9D" class="node"/>
+            <circle cx="130" cy="130" r="6" fill="#7B61FF" class="node node-large"/>
+            <circle cx="170" cy="130" r="6" fill="#7B61FF" class="node node-large"/>
+            <circle cx="220" cy="140" r="5" fill="#00FF9D" class="node"/>
+            <circle cx="110" cy="170" r="5" fill="#00E5FF" class="node"/>
+            <circle cx="150" cy="175" r="5" fill="#00E5FF" class="node"/>
+            <circle cx="190" cy="170" r="5" fill="#00E5FF" class="node"/>
+            <!-- Connections -->
+            <line x1="100" y1="100" x2="150" y2="80"  stroke="#00E5FF" stroke-width="1" opacity="0.5" class="conn"/>
+            <line x1="150" y1="80"  x2="200" y2="100" stroke="#00E5FF" stroke-width="1" opacity="0.5" class="conn"/>
+            <line x1="100" y1="100" x2="130" y2="130" stroke="#7B61FF" stroke-width="1" opacity="0.6" class="conn"/>
+            <line x1="200" y1="100" x2="170" y2="130" stroke="#7B61FF" stroke-width="1" opacity="0.6" class="conn"/>
+            <line x1="80"  y1="140" x2="130" y2="130" stroke="#00FF9D" stroke-width="1" opacity="0.5" class="conn"/>
+            <line x1="220" y1="140" x2="170" y2="130" stroke="#00FF9D" stroke-width="1" opacity="0.5" class="conn"/>
+            <line x1="130" y1="130" x2="170" y2="130" stroke="#7B61FF" stroke-width="2" opacity="0.7" class="conn"/>
+            <line x1="130" y1="130" x2="110" y2="170" stroke="#00E5FF" stroke-width="1" opacity="0.5" class="conn"/>
+            <line x1="130" y1="130" x2="150" y2="175" stroke="#00E5FF" stroke-width="1" opacity="0.5" class="conn"/>
+            <line x1="170" y1="130" x2="190" y2="170" stroke="#00E5FF" stroke-width="1" opacity="0.5" class="conn"/>
+            <line x1="170" y1="130" x2="150" y2="175" stroke="#00E5FF" stroke-width="1" opacity="0.5" class="conn"/>
+            <!-- Signal pulses -->
+            <circle class="signal-pulse" r="3" fill="#00E5FF" opacity="0.9">
+              <animateMotion dur="2s" repeatCount="indefinite" path="M100,100 L150,80 L200,100"/>
+            </circle>
+            <circle class="signal-pulse" r="3" fill="#00FF9D" opacity="0.9">
+              <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.8s" path="M80,140 L130,130 L150,175"/>
+            </circle>
+            <circle class="signal-pulse" r="3" fill="#7B61FF" opacity="0.9">
+              <animateMotion dur="1.8s" repeatCount="indefinite" begin="0.4s" path="M200,100 L170,130 L190,170"/>
+            </circle>
+          </g>
+          <!-- EEG wave -->
+          <polyline class="eeg-wave-hero" points="30,220 50,220 60,200 70,240 80,210 90,230 100,215 110,225 120,220 130,190 140,250 150,210 160,230 170,215 180,225 190,220 200,200 210,240 220,215 230,225 240,220 260,220" fill="none" stroke="#00E5FF" stroke-width="2" opacity="0.7"/>
+        </svg>
+        <div class="brain-ring ring-1"></div>
+        <div class="brain-ring ring-2"></div>
+        <div class="brain-ring ring-3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── UPLOAD ────────────────────────────────────────────────────────── -->
+  <section id="upload" class="section">
+    <div class="section-header">
+      <span class="section-tag">INPUT</span>
+      <h2 class="section-title">Upload EEG Data</h2>
+      <p class="section-desc">Upload PhysioNet EDF files or CSV EEG recordings for analysis.</p>
+    </div>
+
+    <div class="upload-grid">
+      <div class="upload-box glass-card" id="dropZone">
+        <div class="upload-icon">📡</div>
+        <h3>Drag & Drop EEG File</h3>
+        <p class="upload-hint">Supports .edf, .csv formats</p>
+        <div class="upload-divider"><span>or</span></div>
+        <label class="btn-primary" for="fileInput">Browse File</label>
+        <input type="file" id="fileInput" accept=".edf,.csv" hidden />
+        <div id="fileInfo" class="file-info hidden">
+          <div class="file-info-row"><span>📄 Name:</span><span id="fName">-</span></div>
+          <div class="file-info-row"><span>🆔 Subject:</span><span id="fSubject">-</span></div>
+          <div class="file-info-row"><span>📦 Size:</span><span id="fSize">-</span></div>
+          <div class="file-info-row"><span>⏱ Duration:</span><span id="fDuration">-</span></div>
+        </div>
+        <div id="uploadProgress" class="upload-progress hidden">
+          <div class="progress-bar"><div class="progress-fill" id="uploadFill"></div></div>
+          <span id="uploadPct">0%</span>
+        </div>
+      </div>
+
+      <div class="upload-info-panel">
+        <div class="glass-card info-card">
+          <h4>📘 Supported Dataset</h4>
+          <p>PhysioNet EEG Motor Movement/Imagery Dataset</p>
+          <ul>
+            <li>109 subjects (S001–S109)</li>
+            <li>Runs R03, R04, R07, R08, R11, R12</li>
+            <li>160 Hz sampling rate</li>
+            <li>64 EEG channels</li>
+          </ul>
+        </div>
+        <div class="glass-card info-card">
+          <h4>🏷 Labels Decoded</h4>
+          <div class="label-chip t0">T0 – Rest</div>
+          <div class="label-chip t1">T1 – Left Hand</div>
+          <div class="label-chip t2">T2 – Right Hand</div>
+        </div>
+        <button class="btn-primary full-width" id="analyzeBtn" disabled>
+          <span>🚀 Run Analysis</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── EEG VISUALIZATION ────────────────────────────────────────────── -->
+  <section id="visualization" class="section">
+    <div class="section-header">
+      <span class="section-tag">LIVE SIGNAL</span>
+      <h2 class="section-title">EEG Visualization</h2>
+      <p class="section-desc">Real-time waveform display and channel activity monitoring.</p>
+    </div>
+
+    <div class="viz-metrics">
+      <div class="metric-card glass-card">
+        <div class="metric-icon">⚡</div>
+        <div class="metric-value" id="signalQuality">--</div>
+        <div class="metric-label">Signal Quality (μV)</div>
+      </div>
+      <div class="metric-card glass-card">
+        <div class="metric-icon">🎯</div>
+        <div class="metric-value" id="focusScore">--</div>
+        <div class="metric-label">Focus Score (%)</div>
+      </div>
+      <div class="metric-card glass-card">
+        <div class="metric-icon">🧠</div>
+        <div class="metric-value" id="attentionLevel">--</div>
+        <div class="metric-label">Attention Level (%)</div>
+      </div>
+      <div class="metric-card glass-card">
+        <div class="metric-icon">📻</div>
+        <div class="metric-value" id="alphaPower">--</div>
+        <div class="metric-label">Alpha Power</div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="glass-card chart-card chart-wide">
+        <div class="chart-header">
+          <span class="chart-title">EEG Waveform – Channel 1</span>
+          <span class="chart-badge live">● LIVE</span>
+        </div>
+        <canvas id="eegChart"></canvas>
+      </div>
+      <div class="glass-card chart-card">
+        <div class="chart-header">
+          <span class="chart-title">Frequency Distribution</span>
+        </div>
+        <canvas id="freqChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── AI PIPELINE ───────────────────────────────────────────────────── -->
+  <section id="pipeline" class="section">
+    <div class="section-header">
+      <span class="section-tag">PROCESSING</span>
+      <h2 class="section-title">AI Processing Pipeline</h2>
+      <p class="section-desc">Six-stage intelligent pipeline from raw signal to text output.</p>
+    </div>
+
+    <div class="pipeline-container">
+      <div class="pipeline-step" id="pStep1" data-step="1">
+        <div class="step-icon">📡</div>
+        <div class="step-num">01</div>
+        <div class="step-title">Signal Acquisition</div>
+        <div class="step-desc">EDF/CSV file loaded, metadata extracted, channels identified</div>
+        <div class="step-status idle">IDLE</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" id="pStep2" data-step="2">
+        <div class="step-icon">🔧</div>
+        <div class="step-num">02</div>
+        <div class="step-title">Preprocessing</div>
+        <div class="step-desc">Bandpass filter 1–40Hz, notch at 60Hz, average re-reference</div>
+        <div class="step-status idle">IDLE</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" id="pStep3" data-step="3">
+        <div class="step-icon">🚫</div>
+        <div class="step-num">03</div>
+        <div class="step-title">Noise Removal</div>
+        <div class="step-desc">ICA artifact removal, eye blink correction, EMG suppression</div>
+        <div class="step-status idle">IDLE</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" id="pStep4" data-step="4">
+        <div class="step-icon">🔬</div>
+        <div class="step-num">04</div>
+        <div class="step-title">Feature Extraction</div>
+        <div class="step-desc">PSD, Hjorth params, alpha/beta power, time-domain features</div>
+        <div class="step-status idle">IDLE</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" id="pStep5" data-step="5">
+        <div class="step-icon">🤖</div>
+        <div class="step-num">05</div>
+        <div class="step-title">Classification</div>
+        <div class="step-desc">CNN-LSTM deep learning model classifies T0/T1/T2 states</div>
+        <div class="step-status idle">IDLE</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step" id="pStep6" data-step="6">
+        <div class="step-icon">💬</div>
+        <div class="step-num">06</div>
+        <div class="step-title">Text Generation</div>
+        <div class="step-desc">Motor imagery sequences mapped to characters and phrases</div>
+        <div class="step-status idle">IDLE</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PREDICTION ───────────────────────────────────────────────────── -->
+  <section id="prediction" class="section">
+    <div class="section-header">
+      <span class="section-tag">OUTPUT</span>
+      <h2 class="section-title">AI Prediction Results</h2>
+      <p class="section-desc">Generated text from decoded EEG brain signals.</p>
+    </div>
+
+    <div class="prediction-grid">
+      <div class="glass-card prediction-main">
+        <div class="prediction-label">Generated Text Output</div>
+        <div class="prediction-text" id="generatedText">
+          Waiting for EEG analysis...
+        </div>
+        <div class="prediction-actions">
+          <button class="btn-action" id="copyBtn" onclick="copyText()">
+            📋 Copy Text
+          </button>
+          <button class="btn-action" id="speakBtn" onclick="speakText()">
+            🔊 Speak
+          </button>
+          <button class="btn-action" id="reportBtn" onclick="downloadReport()">
+            📄 Download Report
+          </button>
+        </div>
+      </div>
+
+      <div class="prediction-stats-col">
+        <div class="glass-card pred-stat-card">
+          <div class="pred-stat-icon">🎯</div>
+          <div class="pred-stat-label">Confidence Score</div>
+          <div class="pred-stat-value" id="confScore">--</div>
+          <div class="pred-gauge" id="confGauge">
+            <div class="gauge-fill" id="confFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="glass-card pred-stat-card">
+          <div class="pred-stat-icon">✅</div>
+          <div class="pred-stat-label">Model Accuracy</div>
+          <div class="pred-stat-value" id="accScore">--</div>
+        </div>
+        <div class="glass-card pred-stat-card">
+          <div class="pred-stat-icon">⚡</div>
+          <div class="pred-stat-label">Inference Latency</div>
+          <div class="pred-stat-value" id="latScore">--</div>
+        </div>
+        <div class="glass-card pred-stat-card">
+          <div class="pred-stat-icon">🏷</div>
+          <div class="pred-stat-label">Prediction Sequence</div>
+          <div class="pred-chips" id="predChips">
+            <span class="chip-idle">No predictions yet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ANALYTICS ─────────────────────────────────────────────────────── -->
+  <section id="analytics" class="section">
+    <div class="section-header">
+      <span class="section-tag">DASHBOARD</span>
+      <h2 class="section-title">Analytics Dashboard</h2>
+      <p class="section-desc">Model performance metrics and signal quality analysis.</p>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="glass-card chart-card">
+        <div class="chart-header"><span class="chart-title">Confusion Matrix</span></div>
+        <div class="confusion-matrix" id="confusionMatrix">
+          <div class="cm-placeholder">Run analysis to view</div>
+        </div>
+      </div>
+      <div class="glass-card chart-card">
+        <div class="chart-header"><span class="chart-title">EEG Band Power</span></div>
+        <canvas id="bandChart"></canvas>
+      </div>
+      <div class="glass-card chart-card">
+        <div class="chart-header"><span class="chart-title">Accuracy Over Sessions</span></div>
+        <canvas id="accChart"></canvas>
+      </div>
+      <div class="glass-card chart-card">
+        <div class="chart-header"><span class="chart-title">Signal Quality Index</span></div>
+        <canvas id="qualityChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HISTORY ───────────────────────────────────────────────────────── -->
+  <section id="history" class="section">
+    <div class="section-header">
+      <span class="section-tag">RECORDS</span>
+      <h2 class="section-title">Analysis History</h2>
+      <p class="section-desc">All previous EEG analyses stored in MongoDB.</p>
+    </div>
+    <div class="history-controls">
+      <input type="text" class="search-input" id="histSearch" placeholder="🔍 Search by Subject ID..." oninput="filterHistory()" />
+      <button class="btn-secondary" onclick="loadHistory()">🔄 Refresh</button>
+    </div>
+    <div id="historyList" class="history-list">
+      <div class="history-empty">No analysis history yet. Upload an EEG file to get started.</div>
+    </div>
+  </section>
+
+  <!-- ─── ARCHITECTURE DIAGRAM ─────────────────────────────────────────── -->
+  <section id="architecture" class="section">
+    <div class="section-header">
+      <span class="section-tag">DESIGN</span>
+      <h2 class="section-title">System Architecture</h2>
+      <p class="section-desc">End-to-end BCI pipeline from EEG sensor to text output.</p>
+    </div>
+    <div class="glass-card arch-card">
+      <div class="arch-diagram">
+        <div class="arch-layer">
+          <div class="arch-box eeg-box">EEG Sensor / EDF File</div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer">
+          <div class="arch-box prep-box">MNE Preprocessing<br/><small>Filter → ICA → Epoch</small></div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer">
+          <div class="arch-box feat-box">Feature Extraction<br/><small>PSD · Hjorth · Band Power</small></div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer triple-layer">
+          <div class="arch-box model-box">Random Forest</div>
+          <div class="arch-box model-box highlight">CNN-LSTM ★</div>
+          <div class="arch-box model-box">SVM</div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer">
+          <div class="arch-box api-box">Flask REST API<br/><small>/upload /analyze /predict /report</small></div>
+        </div>
+        <div class="arch-arrow-down">↓</div>
+        <div class="arch-layer triple-layer">
+          <div class="arch-box output-box">Text Output</div>
+          <div class="arch-box output-box">PDF Report</div>
+          <div class="arch-box output-box">MongoDB Log</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ─── AI CHAT ASSISTANT ─────────────────────────────────────────────── -->
+<div class="chat-fab" id="chatFab" onclick="toggleChat()" title="Ask NeuroSpeak Assistant">🧠</div>
+<div class="chat-panel glass-card" id="chatPanel">
+  <div class="chat-header">
+    <span>🧠 NeuroSpeak Assistant</span>
+    <button onclick="toggleChat()" title="Close">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot" style="white-space:pre-wrap">👋 Hi! I'm the NeuroSpeak AI Assistant.
+
+I know everything about this project — EEG signals, ML models, signal processing, dataset, technology stack, and more.
+
+Try asking:
+  • How does NeuroSpeak work?
+  • How is the ML model trained?
+  • What technology is used?
+  • What is EEG?
+  • Explain signal processing</div>
+    <div class="chat-suggestions">
+      <button class="sug-chip" onclick="askSuggestion('How does NeuroSpeak work?')">How it works?</button>
+      <button class="sug-chip" onclick="askSuggestion('What technology is used?')">Tech stack</button>
+      <button class="sug-chip" onclick="askSuggestion('How is the ML model trained?')">ML training</button>
+      <button class="sug-chip" onclick="askSuggestion('What is T0 T1 T2?')">T0 T1 T2</button>
+      <button class="sug-chip" onclick="askSuggestion('How accurate is the model?')">Accuracy</button>
+      <button class="sug-chip" onclick="askSuggestion('Explain signal processing steps')">Signal processing</button>
+      <button class="sug-chip" onclick="askSuggestion('What features are extracted?')">Features</button>
+      <button class="sug-chip" onclick="askSuggestion('What dataset is used?')">Dataset</button>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" class="chat-input" placeholder="Ask anything about NeuroSpeak..." onkeydown="if(event.key==='Enter')sendChat()" />
+    <button class="chat-send" onclick="sendChat()" title="Send">→</button>
+  </div>
+</div>
+
+<!-- ─── DARK/LIGHT MODE TOGGLE ───────────────────────────────────────── -->
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+</html>

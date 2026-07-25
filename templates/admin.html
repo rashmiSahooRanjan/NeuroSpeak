@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>NeuroSpeak Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#00E5FF;--purple:#7B61FF;--green:#00FF9D;--bg:#0B1020;--bg2:#0F1630;--glass:rgba(15,22,48,0.8);--border:rgba(0,229,255,0.18);--text:#E0E8FF;--dim:#7A8AAA}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .header{background:var(--glass);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(16px)}
+    .logo{font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--cyan);text-shadow:0 0 12px var(--cyan)}
+    .admin-badge{background:rgba(123,97,255,0.15);border:1px solid var(--purple);color:var(--purple);padding:4px 12px;border-radius:20px;font-size:0.8rem}
+    .container{padding:32px;max-width:1400px;margin:0 auto}
+    h1{font-family:'Orbitron',monospace;font-size:1.8rem;margin-bottom:8px;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .subtitle{color:var(--dim);margin-bottom:32px}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+    .stat-card{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;backdrop-filter:blur(12px)}
+    .stat-card .val{font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;color:var(--cyan);display:block;margin-bottom:4px}
+    .stat-card .lbl{font-size:0.8rem;color:var(--dim)}
+    .table-card{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:24px;backdrop-filter:blur(12px);margin-bottom:24px;overflow-x:auto}
+    .table-card h3{font-size:1rem;font-weight:600;margin-bottom:16px;color:var(--cyan)}
+    table{width:100%;border-collapse:collapse;font-size:0.85rem}
+    th{padding:10px 14px;text-align:left;color:var(--dim);border-bottom:1px solid var(--border);font-weight:600}
+    td{padding:10px 14px;border-bottom:1px solid rgba(0,229,255,0.06)}
+    tr:hover td{background:rgba(0,229,255,0.03)}
+    .badge{padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600}
+    .badge.good{background:rgba(0,255,157,0.12);border:1px solid var(--green);color:var(--green)}
+    .badge.warn{background:rgba(255,200,0,0.1);border:1px solid #FFC800;color:#FFC800}
+    .badge.err {background:rgba(255,77,109,0.1);border:1px solid #FF4D6D;color:#FF4D6D}
+    .actions{display:flex;gap:8px;margin-bottom:24px}
+    .btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.2s}
+    .btn-primary{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff}
+    .btn-outline{background:transparent;border:1px solid var(--cyan);color:var(--cyan)}
+    .btn:hover{opacity:0.85;transform:translateY(-1px)}
+    .online{color:var(--green)} .offline{color:#FF4D6D}
+    @media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+<div class="header">
+  <span class="logo">🧠 NeuroSpeak</span>
+  <span class="admin-badge">⚙️ Admin Dashboard</span>
+</div>
+
+<div class="container">
+  <h1>Admin Control Panel</h1>
+  <p class="subtitle">System overview, user management, and model statistics.</p>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><span class="val" id="totalAnalyses">—</span><span class="lbl">Total Analyses</span></div>
+    <div class="stat-card"><span class="val" id="totalSubjects">—</span><span class="lbl">Total Subjects</span></div>
+    <div class="stat-card"><span class="val" id="avgAccuracy">—</span><span class="lbl">Avg Accuracy %</span></div>
+    <div class="stat-card"><span class="val" id="avgConf">—</span><span class="lbl">Avg Confidence %</span></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="loadData()">🔄 Refresh</button>
+    <button class="btn btn-outline" onclick="window.location='/'">← Main Dashboard</button>
+    <button class="btn btn-outline" onclick="checkHealth()">🟢 Server Health</button>
+  </div>
+
+  <div class="table-card">
+    <h3>📋 Recent Analyses</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Analysis ID</th><th>Subject</th><th>Generated Text</th>
+          <th>Confidence</th><th>Accuracy</th><th>Timestamp</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="analysesTable"><tr><td colspan="7" style="color:var(--dim);text-align:center;padding:32px">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="table-card" id="healthCard">
+    <h3>🔧 System Health</h3>
+    <table>
+      <thead><tr><th>Component</th><th>Status</th><th>Details</th></tr></thead>
+      <tbody id="healthTable"><tr><td colspan="3" style="color:var(--dim);text-align:center;padding:24px">Click "Server Health" to check</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+async function loadData() {
+  try {
+    const [stats, hist] = await Promise.all([
+      fetch('/api/dashboard/stats').then(r => r.json()),
+      fetch('/api/history?limit=20').then(r => r.json())
+    ]);
+    document.getElementById('totalAnalyses').textContent = stats.total_analyses || 0;
+    document.getElementById('totalSubjects').textContent = stats.total_subjects || 0;
+    document.getElementById('avgAccuracy').textContent = (stats.avg_accuracy || 0) + '%';
+    document.getElementById('avgConf').textContent = (stats.avg_confidence || 0) + '%';
+
+    const rows = (hist.history || []).map(r => `
+      <tr>
+        <td style="font-family:monospace;font-size:0.78rem;color:var(--cyan)">${(r.analysis_id||'').slice(0,8).toUpperCase()}</td>
+        <td>${r.subject_id||'—'}</td>
+        <td>${(r.generated_text||'—').slice(0,25)}</td>
+        <td>${r.confidence||0}%</td>
+        <td>${r.accuracy||0}%</td>
+        <td style="color:var(--dim);font-size:0.78rem">${r.timestamp ? new Date(r.timestamp).toLocaleString() : '—'}</td>
+        <td><span class="badge good">Complete</span></td>
+      </tr>`).join('');
+    document.getElementById('analysesTable').innerHTML = rows || '<tr><td colspan="7" style="color:var(--dim);text-align:center">No records found</td></tr>';
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+async function checkHealth() {
+  try {
+    const h = await fetch('/api/health').then(r => r.json());
+    document.getElementById('healthTable').innerHTML = `
+      <tr><td>Flask Server</td><td><span class="badge good">🟢 Online</span></td><td>v${h.version}</td></tr>
+      <tr><td>ML Model</td><td><span class="badge good">🟢 Loaded</span></td><td>${h.model}</td></tr>
+      <tr><td>MongoDB</td><td><span class="badge ${h.db ? 'good' : 'warn'}">${h.db ? '🟢 Connected' : '🟡 Fallback'}</span></td><td>${h.db ? 'Atlas/Local' : 'In-Memory'}</td></tr>
+      <tr><td>Timestamp</td><td colspan="2" style="color:var(--dim)">${h.timestamp}</td></tr>`;
+  } catch(e) {
+    document.getElementById('healthTable').innerHTML = '<tr><td colspan="3" style="color:#FF4D6D">❌ Server unreachable</td></tr>';
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>

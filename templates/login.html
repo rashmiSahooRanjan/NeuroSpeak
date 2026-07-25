@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>NeuroSpeak – Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#00E5FF;--purple:#7B61FF;--green:#00FF9D;--bg:#0B1020;--glass:rgba(15,22,48,0.85);--border:rgba(0,229,255,0.2);--text:#E0E8FF;--dim:#7A8AAA}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.15;pointer-events:none}
+    .orb1{width:400px;height:400px;top:-100px;right:-80px;background:var(--cyan)}
+    .orb2{width:300px;height:300px;bottom:-60px;left:-60px;background:var(--purple)}
+    .card{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:100%;max-width:420px;backdrop-filter:blur(20px);position:relative;z-index:1}
+    .logo{font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;color:var(--cyan);text-align:center;text-shadow:0 0 20px var(--cyan);margin-bottom:6px}
+    .sub{text-align:center;color:var(--dim);font-size:0.85rem;margin-bottom:28px}
+    .tabs{display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:28px}
+    .tab{flex:1;padding:10px;text-align:center;font-size:0.9rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--dim);transition:all 0.2s}
+    .tab.active{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff}
+    .form-group{margin-bottom:18px}
+    label{font-size:0.8rem;color:var(--dim);display:block;margin-bottom:6px}
+    input,select{width:100%;padding:11px 14px;background:rgba(0,229,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;font-family:'Space Grotesk',sans-serif;outline:none;transition:border 0.2s}
+    input:focus,select:focus{border-color:var(--cyan)}
+    select option{background:var(--bg)}
+    .btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff;border:none;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:8px;transition:all 0.2s}
+    .btn:hover{opacity:0.88;transform:translateY(-1px)}
+    .msg{padding:10px 14px;border-radius:8px;font-size:0.85rem;margin-top:14px;text-align:center}
+    .msg.success{background:rgba(0,255,157,0.1);border:1px solid var(--green);color:var(--green)}
+    .msg.error{background:rgba(255,77,109,0.1);border:1px solid #FF4D6D;color:#FF4D6D}
+    .back{text-align:center;margin-top:18px;font-size:0.85rem;color:var(--dim)}
+    .back a{color:var(--cyan);text-decoration:none}
+    .back a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="card">
+  <div class="logo">🧠 NeuroSpeak</div>
+  <div class="sub">Brain Signal to Text Communication System</div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('login',this)">Login</button>
+    <button class="tab" onclick="showTab('register',this)">Register</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="loginForm">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="loginEmail" placeholder="doctor@hospital.com"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn" onclick="doLogin()">🔐 Login</button>
+    <div id="loginMsg"></div>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="registerForm" style="display:none">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="regName" placeholder="Dr. Ramesh Kumar"/>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="regEmail" placeholder="doctor@hospital.com"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="regPw" placeholder="Min 8 characters"/>
+    </div>
+    <div class="form-group">
+      <label>Role</label>
+      <select id="regRole">
+        <option value="patient">Patient</option>
+        <option value="doctor">Doctor</option>
+        <option value="researcher">Researcher</option>
+      </select>
+    </div>
+    <button class="btn" onclick="doRegister()">📝 Create Account</button>
+    <div id="regMsg"></div>
+  </div>
+
+  <div class="back"><a href="/">← Back to Dashboard</a></div>
+</div>
+
+<script>
+function showTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('loginForm').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? '' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw    = document.getElementById('loginPw').value;
+  const msg   = document.getElementById('loginMsg');
+  if (!email || !pw) { showMsg(msg, 'Please fill in all fields', 'error'); return; }
+  try {
+    const r = await fetch('/api/auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password: pw})
+    });
+    const d = await r.json();
+    if (d.token) {
+      localStorage.setItem('ns_token', d.token);
+      localStorage.setItem('ns_role', d.role);
+      showMsg(msg, '✅ Login successful! Redirecting...', 'success');
+      setTimeout(() => window.location = d.role === 'admin' ? '/admin' : '/', 1200);
+    } else {
+      showMsg(msg, d.error || 'Login failed', 'error');
+    }
+  } catch {
+    showMsg(msg, '❌ Server error. Please try again.', 'error');
+  }
+}
+
+async function doRegister() {
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pw    = document.getElementById('regPw').value;
+  const role  = document.getElementById('regRole').value;
+  const msg   = document.getElementById('regMsg');
+  if (!name || !email || !pw) { showMsg(msg, 'Please fill in all fields', 'error'); return; }
+  if (pw.length < 8)           { showMsg(msg, 'Password must be at least 8 characters', 'error'); return; }
+  try {
+    const r = await fetch('/api/auth/register', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, email, password: pw, role})
+    });
+    const d = await r.json();
+    if (d.success) {
+      showMsg(msg, '✅ Account created! Please login.', 'success');
+      setTimeout(() => showTab('login', document.querySelector('.tab')), 1500);
+    } else {
+      showMsg(msg, d.error || 'Registration failed', 'error');
+    }
+  } catch {
+    showMsg(msg, '❌ Server error. Please try again.', 'error');
+  }
+}
+
+function showMsg(el, text, type) {
+  el.className = 'msg ' + type;
+  el.textContent = text;
+}
+</script>
+</body>
+</html>

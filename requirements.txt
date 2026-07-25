@@ -1,0 +1,50 @@
+# ============================================================
+#  NeuroSpeak – Requirements for Python 3.14 on Windows
+#  All packages have pre-built wheels for cp314-win_amd64
+#  Install: pip install -r requirements.txt
+# ============================================================
+
+# ── Web Framework ──────────────────────────────────────────
+flask==3.1.3
+flask-cors==6.0.2
+flask-pymongo==3.0.1
+werkzeug==3.1.8
+
+# ── Database ───────────────────────────────────────────────
+pymongo==4.17.0
+
+# ── Core Scientific Stack (cp314 wheels confirmed) ─────────
+# NOTE: numpy 2.2.6 has NO cp314 Windows wheel → use 2.4.6
+numpy==2.4.6
+pandas==3.0.3
+scipy==1.17.1
+
+# ── Machine Learning ───────────────────────────────────────
+scikit-learn==1.9.0
+joblib==1.5.0
+
+# ── Deep Learning ──────────────────────────────────────────
+# TensorFlow has NO Python 3.14 wheel yet (max is cp313).
+# The project runs fully without it (uses RF/SVM instead).
+# If you need CNN-LSTM, install Python 3.13 and use:
+#   tensorflow==2.21.0
+# Uncomment the line below ONLY on Python 3.13:
+# tensorflow==2.21.0
+
+# ── EEG Signal Processing ──────────────────────────────────
+mne==1.12.1
+
+# ── PDF Report Generation ──────────────────────────────────
+reportlab==4.5.1
+
+# ── Authentication ─────────────────────────────────────────
+pyjwt==2.13.0
+bcrypt==5.0.0
+
+# ── Visualisation ──────────────────────────────────────────
+matplotlib==3.10.9
+seaborn==0.13.2
+
+# ── Env & Deployment ───────────────────────────────────────
+python-dotenv==1.2.2
+gunicorn==26.0.0
