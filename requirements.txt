@@ -47,4 +47,4 @@ seaborn==0.13.2
 
 # ── Env & Deployment ───────────────────────────────────────
 python-dotenv==1.2.2
-gunicorn==26.0.0
+gunicorn==23.0.0
