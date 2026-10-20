@@ -239,6 +239,7 @@ docker run -p 5000:5000 -e MONGO_URI=your_uri neurospeak
 | **Rashmi Ranjan Sahoo** | ML Developer |
 | **Prachurya Samal**     | Developer |
 | **Rahul Barika**        | Developer |
+
 ## 👥 Team
 
 | Role              | Responsibility                        |
